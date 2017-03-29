@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 // pipe in the file
-// git grep Order_Line_Items__c.Air_PO__c -- '*.profile' | cut -d':' -f1 | file-parser
+// git grep Order_Line_Items__c.Air_PO__c -- '*.profile' | cut -d':' -f1 | file-parser matchString='Order_Line_Items__c.Air_PO__c'
 
 // or pass in as a parameter
 // file-parser matchString=test.one sourceFile=test-file
@@ -51,7 +51,7 @@ var parseFile = function(fileName, outputStream) {
         console.log(`parseFile -> ${fileName}`);
     }
 
-    var blockBuffer = '';
+    var blockBuffer = [];
     var readingBlock = 'off';
 
     return function(input) {
@@ -63,17 +63,13 @@ var parseFile = function(fileName, outputStream) {
         }
 
         if (readingBlock == 'on') {
-            if (blockBuffer!='') {
-                blockBuffer += '\r\n';
-            }
-            blockBuffer += `${input}`;
+            blockBuffer.push(`${input}`);
         } else {
             if (blockBuffer != '') {
-                if (!blockBuffer.match(options.matchString)) {
-                    // console.log(`${blockBuffer}`);
-                    outputStream.write(`${blockBuffer}\r\n${input}\r\n`);
+                if (!blockBuffer.join('').match(options.matchString)) {
+                    outputStream.write(`${blockBuffer.join('\r\n')}\r\n${input}\r\n`);
                 }
-                blockBuffer = '';
+                blockBuffer.length = 0;
             } else {
                 outputStream.write(`${input}\r\n`);
             }
