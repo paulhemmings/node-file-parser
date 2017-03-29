@@ -16,7 +16,7 @@ $ npm link
 ```
 
 #### Example
-The "Order_Line_Items__c.Air_PO__c" field is removed. This is referenced in 30+ different files. In each file the following XML block is present. You want to remove this entire block from all 30 files. In this example <fieldPermissions> is the start block, </fieldPermissions> the end block.
+The "Order_Line_Items__c.Air_PO__c" field is removed. This is referenced in 30+ different files. In each file the following XML block is present. You want to remove this entire block from all 30 files. In this example "fieldPermissions" is the start block, "/fieldPermissions" the end block. These are the default start and end blocks defined within Config.yml. They can be overloaded via the command line parameters.
 ```
     <fieldPermissions>
         <editable>true</editable>
