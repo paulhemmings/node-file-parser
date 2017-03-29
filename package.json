@@ -1,0 +1,17 @@
+{
+  "name": "node-file-parser",
+  "version": "1.0.0",
+  "description": "generic file parser",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "paulhemmings",
+  "license": "ISC",
+  "bin": {
+    "file-parser": "index.js"
+  },
+  "dependencies": {
+    "node-yaml-config": "0.0.4"
+  }
+}
