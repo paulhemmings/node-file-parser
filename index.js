@@ -65,7 +65,7 @@ var parseFile = function(fileName, outputStream) {
         if (readingBlock == 'on') {
             blockBuffer.push(`${input}`);
         } else {
-            if (blockBuffer != '') {
+            if (blockBuffer.length != 0) {
                 if (!blockBuffer.join('').match(options.matchString)) {
                     outputStream.write(`${blockBuffer.join('\r\n')}\r\n${input}\r\n`);
                 }
@@ -84,7 +84,7 @@ var parseFileName = function(sourceFileName) {
 
     var fullPath = path.join(process.cwd(),sourceFileName);
     var fileParts = path.parse(fullPath);
-    var destinationFile = path.join(fileParts.dir, 'parser-output', fileParts.name + fileParts.ext);
+    var destinationFile = path.join(process.cwd(), 'parser-output', fileParts.name + fileParts.ext);
     var outputStream = fs.createWriteStream(destinationFile);
 
     readline.createInterface({
