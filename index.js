@@ -85,15 +85,15 @@ var parseFileName = function(sourceFileName) {
     var fullPath = path.join(process.cwd(),sourceFileName);
     var fileParts = path.parse(fullPath);
     var destinationFile = path.join(process.cwd(), 'parser-output', fileParts.name + fileParts.ext);
-    var outputStream = fs.createWriteStream(destinationFile);
-
-    readline.createInterface({
-        input: fs.createReadStream(fullPath)
-    })
-    .on('line', buildLineParser(outputStream))
-    .on('close', () => {
-        console.log(`finished processing -> ${sourceFileName}`);
-        outputStream.end();
+    var outputStream = fs.createWriteStream(destinationFile).once('open', (fd) => {
+        readline.createInterface({
+            input: fs.createReadStream(fullPath)
+        })
+        .on('line', buildLineParser(outputStream))
+        .on('close', () => {
+            console.log(`finished processing -> ${sourceFileName}`);
+            outputStream.end();
+        });
     });
 }
 
