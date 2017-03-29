@@ -39,18 +39,21 @@ args.reduce((result, argument) => {
 var options = Object.assign({}, config, argsNamed);
 
 // show the options
-
-console.log(`options -> ${JSON.stringify(options)}`);
+if (options.showDebug) {
+    console.log(`options -> ${JSON.stringify(options)}`);
+}
 
 // Curry the function we need to parse a file
 
-var parseFile = function(fileName) {
-    console.log(`parseFile -> ${fileName}`);
+var parseFile = function(fileName, outputStream) {
+
+    if (options.showDebug) {
+        console.log(`parseFile -> ${fileName}`);
+    }
+
     var blockBuffer = '';
-    var fileParts = path.parse(fileName);
-    var destinationFile = path.join(fileParts.dir, fileParts.name + ".edited" + fileParts.ext);
-    var outputStream = fs.createWriteStream(destinationFile);
     var readingBlock = 'off';
+
     return function(input) {
 
         if (input.match(options.blockStart)) {
@@ -82,16 +85,41 @@ var parseFile = function(fileName) {
 // the function that handles parsing a file via a read stream
 
 var parseFileName = function(sourceFileName) {
-    console.log(`parseFileName -> ${sourceFileName}`);
+
+    var fullPath = path.join(process.cwd(),sourceFileName);
+    var fileParts = path.parse(fullPath);
+    var destinationFile = path.join(fileParts.dir, 'parser-output', fileParts.name + fileParts.ext);
+    var outputStream = fs.createWriteStream(destinationFile);
+
     readline.createInterface({
-        input: fs.createReadStream(path.join(process.cwd(),sourceFileName))
-    }).on('line', parseFile(path.join(process.cwd(),sourceFileName)));
+        input: fs.createReadStream(fullPath)
+    })
+    .on('line', parseFile(fullPath, outputStream))
+    .on('close', () => {
+        console.log(`finished processing -> ${sourceFileName}`);
+        outputStream.end();
+    });
 }
 
-// read the file to parse from stdin (piped in) or as a parameter
+// if we have got this far, we will need an output folder.
+// we're going to create this synchronously because it's a one off operation
+
+var outputDirectory = path.join(process.cwd(),'parser-output');
+if (!fs.existsSync(outputDirectory)) {
+    fs.mkdirSync(outputDirectory);
+}
+
+// read the file to parse as a parameter if there
+
+if (options.sourceFile) {
+    parseFileName(options.sourceFile);
+    return;
+}
+
+// if reading files from stdin (via pipe) process each new line as a new file
 
 readline.createInterface({
-  input: options.sourceFile ? fs.createReadStream(options.sourceFile) : process.stdin
-}).on('line', options.sourceFile ? parseFile(options.sourceFile) : parseFileName );
+  input: process.stdin
+}).on('line', parseFileName);
 
 // end
