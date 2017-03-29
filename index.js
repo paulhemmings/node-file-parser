@@ -45,11 +45,7 @@ if (options.showDebug) {
 
 // Curry the function we need to parse a file
 
-var parseFile = function(fileName, outputStream) {
-
-    if (options.showDebug) {
-        console.log(`parseFile -> ${fileName}`);
-    }
+var buildLineParser = function(outputStream) {
 
     var blockBuffer = [];
     var readingBlock = 'off';
@@ -82,6 +78,10 @@ var parseFile = function(fileName, outputStream) {
 
 var parseFileName = function(sourceFileName) {
 
+    if (options.showDebug) {
+        console.log(`parseFile -> ${sourceFileName}`);
+    }
+
     var fullPath = path.join(process.cwd(),sourceFileName);
     var fileParts = path.parse(fullPath);
     var destinationFile = path.join(process.cwd(), 'parser-output', fileParts.name + fileParts.ext);
@@ -90,7 +90,7 @@ var parseFileName = function(sourceFileName) {
     readline.createInterface({
         input: fs.createReadStream(fullPath)
     })
-    .on('line', parseFile(fullPath, outputStream))
+    .on('line', buildLineParser(outputStream))
     .on('close', () => {
         console.log(`finished processing -> ${sourceFileName}`);
         outputStream.end();
