@@ -1,11 +1,11 @@
 #! /usr/bin/env node
 
-// example way of running this
-// pipe in the file >>
+// pipe in the file
 // git grep Order_Line_Items__c.Air_PO__c -- '*.profile' | cut -d':' -f1 | file-parser
-// or pass in as parameter >>
-// node ~/Projects/_mine/node-file-parser/index.js < ./src/profiles/Trade.profile  > testTrade.profile
-// it will remove JUSt the field permission called "Order_Line_Items__c.Air_PO__c"
+
+// or pass in as a parameter
+// file-parser matchString=test.one sourceFile=test-file
+
 
 const path = require('path');
 const fs = require('fs');
@@ -91,7 +91,7 @@ var parseFileName = function(sourceFileName) {
 // read the file to parse from stdin (piped in) or as a parameter
 
 readline.createInterface({
-  input: options.searchFile ? fs.createReadStream(options.searchFile) : process.stdin
-}).on('line', options.searchFile ? parseFile(options.searchFile) : parseFileName );
+  input: options.sourceFile ? fs.createReadStream(options.sourceFile) : process.stdin
+}).on('line', options.sourceFile ? parseFile(options.sourceFile) : parseFileName );
 
 // end
